@@ -72,6 +72,12 @@ class ClientHandler extends Thread {
             System.out.println("request for getting Time: "+ MultiClientServer.simulationtime.getTime());
             return MultiClientServer.simulationtime.getTime();
         }
+        //oben ohne detaills unten mit details
+        String[] split = request.split(":");
+        if(split.length==0) return "";
+        if(split[0].equals("STATION")){ //GET:STATION:Name
+            return getStation(split[1]);
+        }
         return "";
     }
     public String createUser(String username){
@@ -79,5 +85,23 @@ class ClientHandler extends Thread {
         UserManager.addUser(newUser);
         System.out.println(UserManager.getUsers());
         return newUser.station.name;
+    }
+    public String getStation(String name){
+        System.out.println(name);
+        name = name.split(";")[1];
+        System.out.println(name);
+        String output = "";
+        for(Trainstation station: TrainstationManager.getStationlist()){
+            System.out.println("searching: "+name+" currently: "+station.name);
+            if(station.name.equals(name)){
+                //found station with same name
+                // Name:Gleise:Art:ziel1,ziel2,ziel3
+                output =  station.name+";"+station.gleise+";"+station.art+";";
+                for(Trainstation destined: station.destinations){
+                    output+=destined.name+",";
+                }
+            }
+        }
+        return output;
     }
 }
