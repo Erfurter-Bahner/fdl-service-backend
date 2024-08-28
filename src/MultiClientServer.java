@@ -2,7 +2,9 @@ import java.io.*;
 import java.net.*;
 
 public class MultiClientServer {
+    public static SimTime simulationtime = new SimTime();
     public static void main(String[] args) {
+        simulationtime.start();
         int port = 12345;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is listening on port " + port);
@@ -51,6 +53,7 @@ class ClientHandler extends Thread {
         if(request.length==0) return "Error";
         switch(request[0]){
             case "POST": return post(request[1]);
+            case "GET": return get(request[1]);
             default: return "";
         }
     }
@@ -60,6 +63,13 @@ class ClientHandler extends Thread {
         if(split[0].equals("USER")){
             createUser(split[1]);
             return "created User success";
+        }
+        return "";
+    }
+    public String get(String request){
+        if(request.equals("TIME")){
+            System.out.println("request for getting Time: "+ MultiClientServer.simulationtime.getTime());
+            return MultiClientServer.simulationtime.getTime();
         }
         return "";
     }
