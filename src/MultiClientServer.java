@@ -1,0 +1,70 @@
+import java.io.*;
+import java.net.*;
+
+public class MultiClientServer {
+    public static void main(String[] args) {
+        int port = 12345;
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            System.out.println("Server is listening on port " + port);
+
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("New client connected");
+                new ClientHandler(socket).start();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+class ClientHandler extends Thread {
+    private Socket socket;
+
+    public ClientHandler(Socket socket) {
+        this.socket = socket;
+    }
+
+    public void run() {
+        try (InputStream input = socket.getInputStream();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+             OutputStream output = socket.getOutputStream();
+             PrintWriter writer = new PrintWriter(output, true)) {
+
+            String receivedtext;
+            while ((receivedtext = reader.readLine()) != null) {
+                String result = processtext(receivedtext);
+                writer.println(result);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    public String processtext(String text){
+        String[] request = text.split(":");
+        if(request.length==0) return "Error";
+        switch(request[0]){
+            case "POST": return post(request[1]);
+            default: return "";
+        }
+    }
+    public String post(String request){
+        String[] split = request.split("=");
+        if(split.length == 0) return "";
+        if(split[0].equals("USER")){
+            createUser(split[1]);
+            return "created User success";
+        }
+        return "";
+    }
+    public void createUser(String username){
+        UserManager.addUser(new User(username));
+        System.out.println(UserManager.getUsers());
+    }
+}
