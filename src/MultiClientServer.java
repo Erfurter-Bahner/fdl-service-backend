@@ -3,8 +3,10 @@ import java.net.*;
 
 public class MultiClientServer {
     public static SimTime simulationtime = new SimTime();
+    public static TrainstationManager trainstationManager = new TrainstationManager();
     public static void main(String[] args) {
         simulationtime.start();
+        trainstationManager.generateStations();
         int port = 12345;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is listening on port " + port);
@@ -61,8 +63,7 @@ class ClientHandler extends Thread {
         String[] split = request.split("=");
         if(split.length == 0) return "";
         if(split[0].equals("USER")){
-            createUser(split[1]);
-            return "created User success";
+            return createUser(split[1]);
         }
         return "";
     }
@@ -73,8 +74,10 @@ class ClientHandler extends Thread {
         }
         return "";
     }
-    public void createUser(String username){
-        UserManager.addUser(new User(username));
+    public String createUser(String username){
+        User newUser = new User(username);
+        UserManager.addUser(newUser);
         System.out.println(UserManager.getUsers());
+        return newUser.station.name;
     }
 }
