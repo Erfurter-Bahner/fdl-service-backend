@@ -3,8 +3,10 @@ import java.net.*;
 
 public class MultiClientServer {
     public static SimTime simulationtime = new SimTime();
+    public static TrainstationManager trainstationManager = new TrainstationManager();
     public static void main(String[] args) {
         simulationtime.start();
+        trainstationManager.generateStations();
         int port = 12345;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is listening on port " + port);
@@ -22,7 +24,8 @@ public class MultiClientServer {
 
 class ClientHandler extends Thread {
     private Socket socket;
-
+    public String station;
+    public User user;
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
@@ -39,11 +42,15 @@ class ClientHandler extends Thread {
                 writer.println(result);
             }
         } catch (IOException ex) {
+            System.out.println("error first catch");
+            MultiClientServer.trainstationManager.freeStation(station);
+            UserManager.removeUser(user);
             ex.printStackTrace();
         } finally {
             try {
                 socket.close();
             } catch (IOException ex) {
+                System.out.println("error second catch");
                 ex.printStackTrace();
             }
         }
@@ -61,20 +68,44 @@ class ClientHandler extends Thread {
         String[] split = request.split("=");
         if(split.length == 0) return "";
         if(split[0].equals("USER")){
-            createUser(split[1]);
-            return "created User success";
+            return createUser(split[1]);
         }
         return "";
     }
     public String get(String request){
         if(request.equals("TIME")){
-            System.out.println("request for getting Time: "+ MultiClientServer.simulationtime.getTime());
             return MultiClientServer.simulationtime.getTime();
+        }
+        //oben ohne details unten mit details
+        String[] split = request.split(";");
+        if(split.length==0) return "";
+        if(split[0].equals("STATION")){ //GET:STATION:Name
+            System.out.println("getting: "+split[1]);
+            return getStation(split[1]);
         }
         return "";
     }
-    public void createUser(String username){
-        UserManager.addUser(new User(username));
+    public String createUser(String username){
+        User newUser = new User(username);
+        user = newUser;
+        UserManager.addUser(newUser);
         System.out.println(UserManager.getUsers());
+        station = newUser.station.name;
+        return newUser.station.name;
+    }
+    public String getStation(String name){
+        System.out.println(name);
+        String output = "";
+        for(Trainstation station: TrainstationManager.getStationlist()){
+            if(station.name.equals(name)){
+                //found station with same name
+                // Name:Gleise:Art:ziel1,ziel2,ziel3
+                output =  station.name+";"+station.gleise+";"+station.art+";";
+                for(Trainstation destined: station.destinations){
+                    output+=destined.name+",";
+                }
+            }
+        }
+        return output;
     }
 }
