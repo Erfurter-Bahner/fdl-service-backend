@@ -38,4 +38,13 @@ public class TrainstationManager {
         }
         return null;
     }
+    public void freeStation(String station){
+        for(int i=0;i<stationlist.length;i++){
+            if(stationlist[i].name.equals(station)){
+                System.out.println("found station: "+stationlist[i]);
+                taken[i] = false;
+                return;
+            }
+        }
+    }
 }
