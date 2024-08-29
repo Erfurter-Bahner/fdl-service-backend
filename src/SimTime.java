@@ -21,7 +21,6 @@ public class SimTime extends Thread{
             stunden = 0;
             tage++;
         }
-            System.out.println(tage+":"+stunden+":"+minuten+":"+sekunden);
             try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
