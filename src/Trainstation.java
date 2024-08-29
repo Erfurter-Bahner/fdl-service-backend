@@ -2,6 +2,7 @@ public class Trainstation {
     public String name;
     public int gleise;
     public String art;
+    BahnhofsLayout layout;
 
     public Trainstation[] destinations;
     public Trainstation(String name, int gleise, String art, Trainstation[] destinations){
@@ -19,5 +20,8 @@ public class Trainstation {
 
     public void setDestinations(Trainstation[] destinations) {
         this.destinations = destinations;
+    }
+    public void setBahnhofsLayout(BahnhofsLayout layout){
+        this.layout = layout;
     }
 }

@@ -7,6 +7,8 @@ public class MultiClientServer {
     public static void main(String[] args) {
         simulationtime.start();
         trainstationManager.generateStations();
+        BahnhofsLayoutManager.setLayout();
+        trainstationManager.setLayouts();
         int port = 12345;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is listening on port " + port);
@@ -99,13 +101,23 @@ class ClientHandler extends Thread {
         for(Trainstation station: TrainstationManager.getStationlist()){
             if(station.name.equals(name)){
                 //found station with same name
-                // Name:Gleise:Art:ziel1,ziel2,ziel3
+                // Name;Gleise;Art;ziel1,ziel2,ziel3
                 output =  station.name+";"+station.gleise+";"+station.art+";";
                 for(Trainstation destined: station.destinations){
                     output+=destined.name+",";
                 }
+                output+=";";
+                // nach destinationhaltepunkten: ; 1,2,3,4..10:  1,3,2..0:  2,4,5,1..0:
+                for(int[] row : station.layout.layout){
+                    for(int cell : row){
+                        output+=cell+",";
+                    }
+                    output+=":";
+                }
+                output+=";";
             }
         }
+        System.out.println(output);
         return output;
     }
 }
