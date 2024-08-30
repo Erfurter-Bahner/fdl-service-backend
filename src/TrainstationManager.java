@@ -50,5 +50,6 @@ public class TrainstationManager {
 
     public void setLayouts() {
         grabsleben.setBahnhofsLayout(BahnhofsLayoutManager.ZweiGleiseDreiZiele);
+        huemme.setBahnhofsLayout(BahnhofsLayoutManager.DreiGleiseZweiZiele);
     }
 }
